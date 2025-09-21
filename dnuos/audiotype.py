@@ -221,7 +221,7 @@ class Ogg(AudioType):
                 listlength = struct.unpack(llclformat,
                                            self._f.read(llclformatsize))[0]
                 comments = []
-                for i in xrange(listlength):
+                for i in range(listlength):
                     commentlength = struct.unpack(llclformat,
                                         self._f.read(llclformatsize))[0]
                     format = "<%ds" % commentlength
@@ -651,7 +651,7 @@ class MPC(AudioType):
 
         _search_header = self._search_header
         self._f.seek(0)
-        for x in xrange(self.filesize / 1024):
+        for x in range(self.filesize // 1024):
             buf = self._f.read(1024)
             if _search_header(buf):
                 return (x * 1024) + buf.find('MP+')
@@ -794,7 +794,7 @@ class FLAC(AudioType):
                    data[4] & 0x0000000FFFFFFFFFL)
             elif type_ == 3:
                 # Seektable
-                for i in xrange(length / 18):
+                for i in range(length // 18):
                     self.seekpoints.append(struct.unpack('<2QH',
                         self._f.read(18)))
             elif type_ == 4:
@@ -817,7 +817,7 @@ class FLAC(AudioType):
     def read_comment_header(self):
         lst = []
         vendor = self.read_string()
-        for i in xrange(self.read_length()):
+        for i in range(self.read_length()):
             lst.append(self.read_string())
         return vendor, lst
 

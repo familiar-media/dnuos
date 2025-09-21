@@ -147,7 +147,7 @@ def _win32_utf8_argv():
             else:
                 start = 0
             return [argv[i].encode('utf-8') for i in
-                    xrange(start, argc.value)]
+                    range(start, argc.value)]
     except Exception:
         pass
 
@@ -184,7 +184,7 @@ def main(argv=None, locale=''):
     warnings.formatwarning = formatwarning
     try:
         options = parse_args(argv)
-    except SystemExit, e:
+    except SystemExit as e:
         return e.code
     data = Data(options.unknown_types)
     audiodir.Dir.valid_types.extend(options.unknown_types or ())
@@ -193,10 +193,10 @@ def main(argv=None, locale=''):
         import shutil
         try:
             shutil.rmtree(options.cache_dir)
-        except OSError, err:
-            print >> sys.stderr, _('Failed to delete cache: %s') % err
+        except OSError as err:
+            print(_('Failed to delete cache: %s') % err, file=sys.stderr)
             return 2
-        print _('Removed cache directory %s') % options.cache_dir
+        print(_('Removed cache directory %s') % options.cache_dir)
         return 0
 
     adir_class = audiodir.Dir
@@ -207,16 +207,16 @@ def main(argv=None, locale=''):
                                 options.cache_dir))
             if options.cull_cache:
                 culled = cache.cull()
-                print _('Culled %d non-existent directories') % culled
+                print(_('Culled %d non-existent directories') % culled)
                 return 0
             adir_class = memoized(audiodir.Dir, cache)
-        except (ImportError, IOError), err:
+        except (ImportError, IOError) as err:
             options.use_cache = False
-            print >> sys.stderr, _('Failed to create cache directory:')
+            print(_('Failed to create cache directory:'), file=sys.stderr)
             if options.debug:
                 raise
-            print >> sys.stderr, err
-            print >> sys.stderr, _('Use the --disable-cache switch to '
+            print(err, file=sys.stderr)
+            print(_('Use the --disable-cache switch to '
                                    'disable caching')
 
     try:
@@ -242,19 +242,19 @@ def main(argv=None, locale=''):
                or sys.stdout)
     try:
         for chunk in result:
-            print >> outfile, chunk
+            print(chunk, file=outfile)
     finally:
         # Store updated cache
         if options.basedirs and options.use_cache:
             try:
                 cache.save()
-            except IOError, err:
-                print >> sys.stderr, _('Failed to save cache data:')
+            except IOError as err:
+                print(_('Failed to save cache data:'), file=sys.stderr)
                 if options.debug:
                     raise
-                print >> sys.stderr, err
-                print >> sys.stderr, _('Use the --disable-cache switch to '
-                                       'disable caching')
+                print(err, file=sys.stderr)
+                print(_('Use the --disable-cache switch to '
+                                       'disable caching'), file=sys.stderr)
                 return 2
 
 

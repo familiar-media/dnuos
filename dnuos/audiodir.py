@@ -128,27 +128,27 @@ class Dir(object):
 
         res = {}
         for stream in streams:
-            for tag, artist in stream.artist().iteritems():
+            for tag, artist in stream.artist().items():
                 res.setdefault(tag, set()).add(artist)
-        return dict([(k, tuple(v)) for (k, v) in res.iteritems()])
+        return dict([(k, tuple(v)) for (k, v) in res.items()])
 
     def _parse_album(self, streams):
         """Gets the album for the audio files"""
 
         res = {}
         for stream in streams:
-            for tag, album in stream.album().iteritems():
+            for tag, album in stream.album().items():
                 res.setdefault(tag, set()).add(album)
-        return dict([(k, tuple(v)) for (k, v) in res.iteritems()])
+        return dict([(k, tuple(v)) for (k, v) in res.items()])
 
     def _parse_year(self, streams):
         """Gets the year for the audio files"""
 
         res = {}
         for stream in streams:
-            for tag, year in stream.year().iteritems():
+            for tag, year in stream.year().items():
                 res.setdefault(tag, set()).add(year)
-        return dict([(k, tuple(v)) for (k, v) in res.iteritems()])
+        return dict([(k, tuple(v)) for (k, v) in res.items()])
 
     def _parse_size(self, streams):
         """Determines size in bytes.
@@ -237,9 +237,9 @@ class Dir(object):
             if not profiles:
                 res.setdefault(None, set())
             else:
-                for key, profile in profiles.iteritems():
+                for key, profile in profiles.items():
                     res.setdefault(key, set()).add(profile)
-        return dict([(k, tuple(v)) for (k, v) in res.iteritems()])
+        return dict([(k, tuple(v)) for (k, v) in res.items()])
 
     def _get_profile(self):
         """Return encoding profile name.

@@ -2,7 +2,10 @@
 __revision__ = "$Revision: 1.5 $"
 
 import re, struct
-import cStringIO as StringIO
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import io as StringIO
 import string
 
 from dnuos.id3 import ID3v2Frames
@@ -76,7 +79,7 @@ class ID3v2(object):
         try:
             frametype = ID3v2Frames.frameTypes[self.version[1]][frameid][1]
             if frametype != ID3v2Frames.TextInfo:
-                raise Error, "%r is not a TextInfo frame type" % (frameid,)
+                raise Error("%r is not a TextInfo frame type" % (frameid,))
         except KeyError:
             raise Error, "%r is not a TextInfo frame type" % (frameid,)
 
@@ -145,7 +148,7 @@ class ID3v2(object):
         try:
             frame_info = ID3v2Frames.frameTypes[self.version[1]][frameid]
             newframe = frame_info[1](frameid, self.version, data)
-        except KeyError, err:
+        except KeyError as err:
 #           warnings.warn("Unknown frame type %r in file %r" % (frameid, self.filename,))
             newframe = ID3v2Frames.UnknownFrame(frameid, self.version, data)
 
@@ -167,9 +170,9 @@ class ID3v2(object):
         verinfo = fh.read(2)
         self.version = (2,ord(verinfo[0]),ord(verinfo[1]),)
         if(self.version[1] < 3):
-            raise Error, "Cannot process tags with version less than 2.3.0 (This tag's version is 2.%s.%s)" % (self.version[1],self.version[2],)
+            raise Error("Cannot process tags with version less than 2.3.0 (This tag's version is 2.%s.%s)" % (self.version[1],self.version[2],))
         if(self.version[1] > 4) or (self.version[2] > 0):
-            raise Error, "Cannot process tags with version greater than 2.4.0 (This tag's version is 2.%s.%s)" % (self.version[1], self.version[2],)
+            raise Error("Cannot process tags with version greater than 2.4.0 (This tag's version is 2.%s.%s)" % (self.version[1], self.version[2],))
 
         tag_flags = binfuncs.byte2bin(fh.read(1), 8)
 
@@ -187,12 +190,12 @@ class ID3v2(object):
 
         self.tag_size = binfuncs.synchsafe2dec(fh.read(4))
         if DEBUG_LEVEL >= 1:
-            print "tag version: %d.%d.%d" % self.version
-            print "tag size:", self.tag_size
-            print "unsync:", self.unsync
+            print("tag version: %d.%d.%d" % self.version)
+            print("tag size:", self.tag_size)
+            print("unsync:", self.unsync)
 
         if self.version[1] == 3 and self.unsync:
-            # print self.tag_size
+            # print(self.tag_size)
             tag = fh.read(self.tag_size)
             tag = binfuncs.deunsynchstr(tag)
             self.tag_size = len(tag)
@@ -208,7 +211,7 @@ class ID3v2(object):
                 if self.version[1] >= 4 and frameid != 'COM ':
                     framesize = binfuncs.synchsafe2dec(rawframesize)
                     (framesize23,) = struct.unpack('!I', rawframesize)
-#                    print "2.4: %d vs 2.3: %d" % (framesize, framesize23,)
+#                    print("2.4: %d vs 2.3: %d" % (framesize, framesize23,))
                 else:
                     (framesize,) = struct.unpack('!I', rawframesize)
 
@@ -224,7 +227,7 @@ class ID3v2(object):
                         raise BrokenFrameError("Invalid frame size %r (raw: %r).  Frame type was %r. Corrupt tag." % (framesize,rawframesize,frameid,))
                 data = fh.read(framesize + 2)
                 if DEBUG_LEVEL >= 2:
-                    print "Raw frame: %r" % (data,)
+                    print("Raw frame: %r" % (data,))
             elif frameid == '\x00\x00\x00\x00' or frameid == 'MP3e':
                 # MP3ext http://www.mutschler.de/mp3ext/ puts "MP3ext " over and over in the padding
                 sizeleft -= 4
@@ -240,7 +243,7 @@ class ID3v2(object):
             try:
                 if limit_frames and frameid in limit_frames:
                     self.new_frame(frameid, data)
-            except BrokenFrameError, err:
+            except BrokenFrameError as err:
                 if self.broken_frames == 'drop':
 #                   warnings.warn("Broken frame in %r. Dropping frame." % self.filename)
                     pass

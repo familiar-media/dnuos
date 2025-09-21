@@ -66,9 +66,10 @@ class Column(object):
 
     def _textencode(self, str_):
         try:
-            unicode(str_, "ascii")
+            str_.encode("ascii")
         except UnicodeError:
-            str_ = unicode(str_, "latin1")
+            if isinstance(str_, bytes):
+                str_ = str_.decode("latin1")
         except TypeError:
             pass
         else:

@@ -7,7 +7,10 @@ import shutil
 import sys
 import tempfile
 from datetime import datetime
-from cStringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 import dnuos
 import dnuos.appdata
@@ -30,7 +33,7 @@ def test():
             sys.stderr, sys.stdout = old
         cache = dnuos.setup_cache(cache_file)
         assert cache.version == dnuos.audiodir.Dir.__version__
-        for path, adir in cache.iteritems():
+        for path, adir in cache.items():
             assert dnuos.path.isdir(path)
             adir2 = dnuos.audiodir.Dir(path)
             assert adir.albums == adir2.albums

@@ -42,17 +42,17 @@ def testpkg(path):
         try:
             failures, tests = doctest.testmod(__import__(module, {}, {},
                                                          [justmodule]))
-        except Exception, e:
-            print >> sys.stderr, 'Unable to import %r' % module
+        except Exception as e:
+            print('Unable to import %r' % module, file=sys.stderr)
             continue
         if tests > 0:
-            print '%s: %s/%s passed' % (module, tests + (0 - failures), tests)
+            print('%s: %s/%s passed' % (module, tests + (0 - failures), tests))
         total_failures += failures
         total_tests += tests
 
-    print 'Total: %s/%s passed' % (total_tests + (0 - total_failures),
-                                   total_tests)
-    print ''
+    print('Total: %s/%s passed' % (total_tests + (0 - total_failures),
+                                   total_tests))
+    print('')
 
 
 class test(Command):

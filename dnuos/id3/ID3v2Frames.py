@@ -66,7 +66,7 @@ class ID3v2Frame(object):
             raise
         except:
             (exctype, value,) = sys.exc_info()[:2]
-            raise dnuos.id3.BrokenFrameError, "%s: %s" % (exctype, str(value),)
+            raise dnuos.id3.BrokenFrameError("%s: %s" % (exctype, str(value),))
 
 
     def _parse_frame(self, data):
@@ -110,7 +110,7 @@ class ID3v2Frame(object):
             self._unsynchronisation = flags[14]
             self.data_length_indicator = flags[15]
             if self._compression and not self.data_length_indicator:
-                raise dnuos.id3.BrokenFrameError, "The compression flag was set but not the data_length_indicator"
+                raise dnuos.id3.BrokenFrameError("The compression flag was set but not the data_length_indicator")
         else:
             raise dnuos.id3.Error("Unsupported tag (how did we not catch this before?)")
 
@@ -181,8 +181,8 @@ class ID3v2Frame(object):
                     nullindex = nullindex + 1
 
                 return (data[:nullindex], data[nullindex+2:],)
-        except ValueError, err:
-            raise dnuos.id3.BrokenFrameError, "Corrupt tag, orig error: " + str(err)
+        except ValueError as err:
+            raise dnuos.id3.BrokenFrameError("Corrupt tag, orig error: " + str(err))
 
     def termination(self):
         if self._encoding == '\x00' or self._encoding == '\x03':
@@ -202,7 +202,7 @@ class ID3v2Frame(object):
         except KeyboardInterrupt:
             raise KeyboardInterrupt
         except:
-            print "%r" % type(value)
+            print("%r" % type(value))
             raise
 
     def decode(self, value):
@@ -212,16 +212,16 @@ class ID3v2Frame(object):
         # UTF-16
         elif self._encoding == '\x01':
             if value == '':
-                raise dnuos.id3.BrokenFrameError, "Unicode text doesn't have BOM"
-            value = unicode(value, 'utf-16')
+                raise dnuos.id3.BrokenFrameError("Unicode text doesn't have BOM")
+            value = value.decode('utf-16')
         # UTF-16BE
         elif self._encoding == '\x02' and self.version[1] == 4:
-            value = unicode(value, 'utf-16-be')
+            value = value.decode('utf-16-be')
         # UTF-8
         elif self._encoding == '\x03' and self.version[1] == 4:
-            value = unicode(value, 'utf-8')
+            value = value.decode('utf-8')
         else:
-            raise dnuos.id3.BrokenFrameError, "Encoding scheme not in spec (%r). Corrupt tag?" % (self._encoding,)
+            raise dnuos.id3.BrokenFrameError("Encoding scheme not in spec (%r). Corrupt tag?" % (self._encoding,))
         return value
 
     def encode(self, value):
@@ -238,7 +238,7 @@ class ID3v2Frame(object):
         elif self._encoding == '\x03' and self.version[1] == 4:
             value = value.encode('utf-8')
         else:
-            raise dnuos.id3.BrokenFrameError, "Encoding scheme not in spec (%r). Corrupt tag?" % (self._encoding,)
+            raise dnuos.id3.BrokenFrameError("Encoding scheme not in spec (%r). Corrupt tag?" % (self._encoding,))
         return value
 
 class TextInfo(ID3v2Frame):
@@ -403,7 +403,7 @@ class Comment(ID3v2Frame):
 
     def set_language(self, language):
         if len(language) > 3:
-            raise ValueError, "language can't be more than 3 letters long"
+            raise ValueError("language can't be more than 3 letters long")
         self._language = language.rjust(3)
     def get_language(self):
         return self._language
@@ -467,7 +467,7 @@ class AttachedPicture(ID3v2Frame):
     def set_image(self, value):
         type = imghdr.what(None, value)
         if type != 'png' and type != 'jpeg':
-            raise dnuos.id3.Error, "Can't accept images of type %r" % (type,)
+            raise dnuos.id3.Error("Can't accept images of type %r" % (type,))
         self.mimetype = 'image/%s' % (type,)
         self._image = value
     image = property(get_image, set_image)
