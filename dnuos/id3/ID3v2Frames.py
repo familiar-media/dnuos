@@ -1,7 +1,21 @@
 # @(#) $Id: ID3v2Frames.py,v 1.5 2004/03/02 05:26:07 myers_carpenter Exp $
 __version__ = "$Revision: 1.5 $"
 
-import sys, re, zlib, imghdr, struct
+import sys, re, zlib, struct
+
+# Python 3.13+ compatibility - imghdr was removed
+try:
+    import imghdr
+except ImportError:
+    class ImgHdrCompat:
+        def what(self, file, h):
+            # Simple fallback - check magic bytes
+            if h[:8] == b'\x89PNG\r\n\x1a\n':
+                return 'png'
+            elif h[:3] == b'\xff\xd8\xff':
+                return 'jpeg'
+            return None
+    imghdr = ImgHdrCompat()
 
 import dnuos.id3
 from dnuos.id3 import binfuncs

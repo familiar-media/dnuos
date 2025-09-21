@@ -81,7 +81,7 @@ class ID3v2(object):
             if frametype != ID3v2Frames.TextInfo:
                 raise Error("%r is not a TextInfo frame type" % (frameid,))
         except KeyError:
-            raise Error, "%r is not a TextInfo frame type" % (frameid,)
+            raise Error("%r is not a TextInfo frame type" % (frameid,))
 
         for frame in self.frames:
             if frame.id == frameid:

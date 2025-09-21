@@ -49,14 +49,14 @@ def get_terminal_width():
 def print_help(option, opt_str, value, parser):
     """Prints help and exits program"""
 
-    print parser.format_help()
+    print(parser.format_help())
     sys.exit()
 
 
 def exit_with_output_help(option, opt_str, value, parser):
     """Prints output help and exits program"""
 
-    print _(r"""
+    print(_(r""")
 Anything enclosed by brackets is considered a field. A field must have the
 following syntax:
   [TAG]
@@ -432,16 +432,16 @@ def parse_args(argv=sys.argv):
     if not options.basedirs and not (options.cull_cache or
         options.delete_cache):
         if options.disp_version:
-            print ''.join(dnuos.output.plaintext.render_version(
+            print("".join(dnuos.output.plaintext.render_version(), \
                 dnuos.__version__))
             sys.exit()
-        print >> sys.stderr, (_("No folders to process.\nType `%s -h' "
+        print((_("No folders to process.\nType `%s -h' ", file=sys.stderr)
                                 "for help.") % os.path.basename(argv[0]))
         sys.exit(2)
 
     for basedir in options.basedirs:
         if not dnuos.path.exists(basedir):
-            print >> sys.stderr, _('No such file or directory: %s') % basedir
+            print(_('No such file or directory: %s', file=sys.stderr) % basedir
             sys.exit(2)
 
     # options overriding eachother

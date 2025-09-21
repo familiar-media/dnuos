@@ -22,7 +22,7 @@ def user_data_dir(appname, vendor, version=None):
             would typically be "<major>.<minor>".
 
     Typical user data directories are:
-        Windows:    C:\Documents and Settings\USER\Application Data\<owner>\<appname>
+        Windows:    C:\\Documents and Settings\\USER\\Application Data\\<owner>\\<appname>
         Mac OS X:   ~/Library/Application Support/<appname>
         Unix:       ~/.cache/<lowercased-appname>
     """
@@ -72,7 +72,7 @@ def create_user_data_dir(dir_):
 
     if cache:
         if not dnuos.path.exists(cache):
-            dnuos.path.mkdir(cache, 0700)
+            dnuos.path.mkdir(cache, 0o700)
         old_cache = dnuos.path.expanduser('~/.dnuos')
         if dnuos.path.exists(old_cache):
             dnuos.path.rename(old_cache, dir_)

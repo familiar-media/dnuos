@@ -15,6 +15,13 @@ from heapq import heappop, heappush
 from itertools import count
 from warnings import warn
 
+# Python 3 compatibility
+try:
+    cmp
+except NameError:
+    def cmp(a, b):
+        return (a > b) - (a < b)
+
 def _find_locale_dir():
 
     # Avoid unpacking the egg if translation isn't necessary

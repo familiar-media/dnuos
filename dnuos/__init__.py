@@ -6,7 +6,12 @@ import os
 import sys
 import time
 import warnings
-from itertools import chain, ifilter
+from itertools import chain
+try:
+    from itertools import ifilter
+except ImportError:
+    # Python 3
+    ifilter = filter
 
 import dnuos.output.db
 import dnuos.path
@@ -217,7 +222,7 @@ def main(argv=None, locale=''):
                 raise
             print(err, file=sys.stderr)
             print(_('Use the --disable-cache switch to '
-                                   'disable caching')
+                                   'disable caching'), file=sys.stderr)
 
     try:
         renderer = setup_renderer(options.output_module,
@@ -300,32 +305,33 @@ def collect_bad(dir_pairs, bad_files):
         bad_files.extend(adir.bad_files)
 
 
-def non_empty((adir, root)):
+def non_empty(args):
     """Empty directory predicate.
 
     Directories are considered empty if they contain no recognized audio files.
     """
 
+    adir, root = args
     return adir.num_files > len(adir.bad_files)
 
 
-def no_mixed((adir, root)):
+def no_mixed(args):
     """No mixed audio directories predicate"""
-
+    adir, root = args
     return (adir.mediatype != 'Mixed' and adir.brtype != '~' and
             len(adir.bad_files) == 0)
 
 
-def no_cbr_mp3((adir, root)):
+def no_cbr_mp3(args):
     """No CBR MP3 files predicate"""
-
+    adir, root = args
     # This implementation does not consider CBR MP3s in Mixed directories
     return adir.mediatype != "MP3" or adir.brtype not in "C~"
 
 
-def profile_only_mp3((adir, root)):
+def profile_only_mp3(args):
     """No non-profile MP3 predicate"""
-
+    adir, root = args
     # This implementation does not consider non-profile MP3s in Mixed dirs
     return adir.mediatype != "MP3" or adir.profile != ""
 
@@ -334,8 +340,10 @@ def enough_bitrate_mp3(mp3_min_bit_rate):
     """Create low-bitrate MP3 predicate"""
 
     # This implementation does not consider low-bitrate MP3s in Mixed dirs
-    return lambda (adir, root): (adir.mediatype != "MP3" or
-                                 adir.bitrate >= mp3_min_bit_rate)
+    def predicate(args):
+        adir, root = args
+        return (adir.mediatype != "MP3" or adir.bitrate >= mp3_min_bit_rate)
+    return predicate
 
 
 def make_output_db_predicate(options):
@@ -344,7 +352,8 @@ def make_output_db_predicate(options):
     artist_column = DBColumn("A", None, None, options)
     album_column = DBColumn("C", None, None, options)
 
-    def output_db_predicate((adir, root)):
+    def output_db_predicate(args):
+        adir, root = args
         return (adir.mediatype != "Mixed" and
                 artist_column.get(adir) != None and
                 album_column.get(adir) != None)

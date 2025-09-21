@@ -791,7 +791,7 @@ class FLAC(AudioType):
                    data[4] >> 44,
                    (data[4] >> 41 & 0x07) + 1,
                    (data[4] >> 36 & 0x1F) + 1,
-                   data[4] & 0x0000000FFFFFFFFFL)
+                   data[4] & 0x0000000FFFFFFFFF)
             elif type_ == 3:
                 # Seektable
                 for i in range(length // 18):
