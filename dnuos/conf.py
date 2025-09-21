@@ -99,8 +99,8 @@ always done on the right.
 SUFFIX lets you specify a unit to be concatenated to all non-empty data.
 
 Other interpreted sequences are:
-  \[  [
-  \]  ]
+  \\[  [
+  \\]  ]
   \n  new line
   \t  tab character
 
@@ -432,7 +432,7 @@ def parse_args(argv=sys.argv):
     if not options.basedirs and not (options.cull_cache or
         options.delete_cache):
         if options.disp_version:
-            print("".join([dnuos.output.plaintext.render_version(), dnuos.__version__]))
+            print("".join(dnuos.output.plaintext.render_version(dnuos.__version__)))
             sys.exit()
         print(_("No folders to process.\nType `%s -h' for help.") % os.path.basename(argv[0]), file=sys.stderr)
         sys.exit(2)
@@ -456,7 +456,7 @@ def parse_args(argv=sys.argv):
 def expand(options, dir_):
     """translate a basedir to a list of absolute paths"""
 
-    if options.wildcards and re.search("[*?]|(?:\[.*\])", dir_):
+    if options.wildcards and re.search(r"[*?]|(?:\[.*\])", dir_):
         dirs = glob.glob(dir_)
         dirs.sort(options.sort_cmp)
         return [os.path.abspath(d) for d in dirs]

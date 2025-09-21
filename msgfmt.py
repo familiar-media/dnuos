@@ -15,7 +15,7 @@ def _add(messages, id_, str_, fuzzy):
 def _generate(messages):
     """Return the generated output"""
 
-    keys = messages.keys()
+    keys = list(messages.keys())
     # the keys are sorted in the .mo file
     keys.sort()
     offsets = []
@@ -43,15 +43,15 @@ def _generate(messages):
         voffsets += [line2, offset2 + valuestart]
     offsets = koffsets + voffsets
     output = struct.pack("Iiiiiii",
-                         0x950412deL,           # Magic
+                         0x950412de,            # Magic
                          0,                     # Version
                          len(keys),             # # of entries
                          7 * 4,                 # start of key index
                          7 * 4 + len(keys) * 8, # start of value index
                          0, 0)                  # size and offset of hash table
-    output += array.array("i", offsets).tostring()
-    output += ids
-    output += strs
+    output += array.array("i", offsets).tobytes()
+    output += ids.encode('utf-8')
+    output += strs.encode('utf-8')
     return output
 
 

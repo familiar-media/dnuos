@@ -158,6 +158,6 @@ older, has fewer features, and is no longer maintained.
     package_data=package_data,
     scripts=['scripts/dnuos'],
     url='http://bitheap.org/dnuos/',
-    version='1.0.11',
+    version='2.0.0',
     **extra_options
 )
