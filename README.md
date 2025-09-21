@@ -54,11 +54,15 @@ Extract the archive and run `setup.py` to install it:
 
     tar zxvf dnuos-1.0.11.tar.gz
     cd dnuos-1.0.11
-    sudo python2 setup.py install
+    sudo python3 setup.py install
 
 This will install a console script named `dnuos` into `/usr/local/bin`.
 (On Mac OS X 10.4 and earlier, it may get installed into
 `/Library/Frameworks/Python.framework/Versions/Current/bin`.)
+
+Alternatively, you can use modern Python packaging with pip:
+
+    pip install .
 
 Once installed, open up your favorite terminal emulator and run `dnuos`. On
 Mac OS X, *Terminal* might be a good choice (located in
@@ -88,6 +92,20 @@ the following graphical front-ends instead:
 
 News
 ----
+
+### Version 1.0.12 (Unreleased)
+
+* **Python 3 Support**: Fully migrated from Python 2 to Python 3 compatibility
+  - Fixed exception syntax (`except Exception, e:` → `except Exception as e:`)
+  - Converted print statements to print functions with proper file parameters
+  - Updated iterator protocol (`.next()` → `.__next__()`)
+  - Fixed string/Unicode handling for Python 3's unified string model
+  - Updated dictionary iteration methods (`.iteritems()` → `.items()`)
+  - Added compatibility imports for renamed modules (`cStringIO`, `dumbdbm`, etc.)
+  - Replaced deprecated functions (`locale.format()`, `time.clock()`, `os.stat_float_times()`)
+  - Fixed comparison operations to work with Python 3's sorting requirements
+* **Modern Packaging**: Added `pyproject.toml` for modern Python packaging standards
+* **Improved Compatibility**: All doctests and core functionality now work with Python 3.13+
 
 ### Version 1.0.11 (Jul. 18, 2010)
 
@@ -207,7 +225,11 @@ Running the test suite requires the [test data][] (in the same directory as
 `setup.py`). Once you have it, you can run the tests with the following
 command:
 
-    python2 setup.py test
+    python3 setup.py test
+
+You can also run the doctests directly:
+
+    python3 -m doctest dnuos/*.py
 
 Visit [GitHub][] if you'd like to fork the project, watch for new changes,
 or report issues.

@@ -1,3 +1,24 @@
+dnuos (2.0.0-1) unstable; urgency=medium
+
+  * Major version release: Python 3 migration
+  * BREAKING CHANGE: Dropped Python 2 support, now requires Python 3.6+
+  * Fixed exception syntax throughout codebase (except Exception, e: → except Exception as e:)
+  * Converted all print statements to print functions with proper file parameters
+  * Updated iterator protocol (.next() → .__next__()) for Python 3 compatibility
+  * Fixed string/Unicode handling for Python 3's unified string model
+  * Updated dictionary iteration methods (.iteritems() → .items(), .iterkeys() → .keys())
+  * Added compatibility imports for renamed modules (cStringIO → io, dumbdbm → dbm.dumb)
+  * Replaced deprecated functions:
+    - locale.format() → locale.format_string()
+    - time.clock() → time.perf_counter()
+    - Made os.stat_float_times() conditional (removed in Python 3.8+)
+  * Fixed comparison operations to work with Python 3's sorting requirements
+  * Added modern packaging support with pyproject.toml
+  * All doctests and core functionality now verified with Python 3.13+
+  * Updated installation instructions to use python3
+
+ -- Claude AI <noreply@anthropic.com>  Sat, 21 Dec 2024 00:00:00 +0000
+
 dnuos (1.0.11-1) unstable; urgency=low
 
   * Initial release.

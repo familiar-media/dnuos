@@ -61,9 +61,24 @@ The codebase is organized as a Python package with the following structure:
 
 ## Important Technical Details
 
-- **Python Compatibility**: Originally written for Python 2, requires updates for Python 3 compatibility
+- **Python Compatibility**: Fully migrated to Python 3 compatibility (as of v1.0.12)
 - **Caching**: Uses SQLite for caching when available (Python 2.5+), falls back to simpler cache format otherwise
 - **Cache Location**: Linux uses `~/.cache/dnuos` (`$XDG_CACHE_HOME/dnuos`)
 - **Character Encoding**: Handles Unicode file paths and supports terminal's preferred encoding for output
 - **Testing**: Uses doctest framework; test data must be downloaded separately
 - **Quality Detection**: Includes sophisticated MP3 quality preset detection for LAME and other encoders
+
+## Version Release Process
+
+To release a new version, update version numbers in these files:
+
+1. **`dnuos/__init__.py`** (line 3): `__version__ = 'X.Y.Z'` - Primary version source
+2. **`setup.py`** (line 161): `version='X.Y.Z',` - setuptools packaging
+3. **`pyproject.toml`** (line 7): `version = "X.Y.Z"` - Modern packaging
+4. **`README.md`**: Change version section from "(Unreleased)" to "(Date)"
+
+Optional:
+- **`debian/changelog`** - For Debian packaging
+- **`LISEZMOI.md`** - French README if it contains version references
+
+The `__version__` in `dnuos/__init__.py` is the canonical source referenced by HTML output, version commands, and other parts of the codebase.
