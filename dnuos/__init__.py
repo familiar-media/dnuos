@@ -13,6 +13,28 @@ except ImportError:
     # Python 3
     ifilter = filter
 
+try:
+    from functools import cmp_to_key
+except ImportError:
+    # Python 2
+    def cmp_to_key(mycmp):
+        class K:
+            def __init__(self, obj, *args):
+                self.obj = obj
+            def __lt__(self, other):
+                return mycmp(self.obj, other.obj) < 0
+            def __gt__(self, other):
+                return mycmp(self.obj, other.obj) > 0
+            def __eq__(self, other):
+                return mycmp(self.obj, other.obj) == 0
+            def __le__(self, other):
+                return mycmp(self.obj, other.obj) <= 0
+            def __ge__(self, other):
+                return mycmp(self.obj, other.obj) >= 0
+            def __ne__(self, other):
+                return mycmp(self.obj, other.obj) != 0
+        return K
+
 import dnuos.output.db
 import dnuos.path
 from dnuos import appdata, audiodir
@@ -185,7 +207,8 @@ def main(argv=None, locale=''):
     if argv is None:
         argv = _win32_utf8_argv() or sys.argv
 
-    os.stat_float_times(False)
+    if hasattr(os, 'stat_float_times'):
+        os.stat_float_times(False)
     warnings.formatwarning = formatwarning
     try:
         options = parse_args(argv)
@@ -229,9 +252,9 @@ def main(argv=None, locale=''):
                                   options.format_string, options.fields,
                                   options)
     except KeyError:
-        print >> sys.stderr, _('Format string can only contain valid fields')
-        print >> sys.stderr, _('Use the --help-output-string switch for more '
-                               'information')
+        print(_('Format string can only contain valid fields'), file=sys.stderr)
+        print(_('Use the --help-output-string switch for more '
+                               'information'), file=sys.stderr)
         return 2
 
     # Append basedirs to exclude_paths to avoid traversing nested
@@ -272,9 +295,9 @@ def indicate_progress(dir_pairs, sizes, outs=sys.stderr):
     """
 
     for adir, root in dir_pairs:
-        print >> outs, _('%sB processed\r') % to_human(sizes["Total"]),
+        print(_('%sB processed\r') % to_human(sizes["Total"]), end='', file=outs)
         yield adir, root
-    print >> outs, "\r               \r",
+    print("\r               \r", end='', file=outs)
 
 
 def print_bad(dir_pairs):
@@ -288,8 +311,8 @@ def print_bad(dir_pairs):
     for adir, root in dir_pairs:
         yield adir, root
         for badfile, traceback in adir.bad_files:
-            print >> sys.stderr, _('Audiotype failed for:'), badfile
-            print >> sys.stderr, traceback
+            print(_('Audiotype failed for:'), badfile, file=sys.stderr)
+            print(traceback, file=sys.stderr)
 
 
 def collect_bad(dir_pairs, bad_files):
@@ -385,10 +408,10 @@ def timer_wrapper(dir_pairs, times):
     Time in seconds elapsed over the entire iteration is stored in times.
     """
 
-    times['start'] = time.clock()
+    times['start'] = time.perf_counter()
     for adir, root in dir_pairs:
         yield adir, root
-    times['elapsed_time'] = time.clock() - times['start']
+    times['elapsed_time'] = time.perf_counter() - times['start']
 
 
 class EmptyDir(object):
@@ -475,7 +498,7 @@ def walk(dir_, sort_cmp, excluded):
     subs = [sub for sub in subs
             if dnuos.path.isdir(sub)
                and sub not in excluded]
-    subs.sort(sort_cmp)
+    subs.sort(key=cmp_to_key(sort_cmp))
 
     yield dir_
     for sub in subs:

@@ -13,10 +13,15 @@ class Cache(shelve.Shelf, object):
     def __init__(self, filename, version):
         """Construct a new PersistentDict instance"""
 
-        filename = filename.decode('utf-8')
-        filename = filename.encode(sys.getfilesystemencoding())
+        if isinstance(filename, bytes):
+            filename = filename.decode('utf-8')
+        if isinstance(filename, str):
+            filename = filename.encode(sys.getfilesystemencoding())
 
-        import dumbdbm
+        try:
+            import dumbdbm
+        except ImportError:
+            import dbm.dumb as dumbdbm
         super(Cache, self).__init__(
             dumbdbm.open(filename, 'c'),
             protocol=2)

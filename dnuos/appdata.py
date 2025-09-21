@@ -50,7 +50,8 @@ def user_data_dir(appname, vendor, version=None):
         else:
             path = os.path.expanduser('~/.cache')
         path = os.path.join(path, appname.lower())
-        path = path.decode(sys.getfilesystemencoding()).encode('utf-8')
+        if isinstance(path, bytes):
+            path = path.decode(sys.getfilesystemencoding())
     if version:
         path = os.path.join(path, '-' + version)
     return path

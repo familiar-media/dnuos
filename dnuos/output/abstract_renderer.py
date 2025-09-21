@@ -47,9 +47,9 @@ class Column(object):
 
         formatter_table = {
             "b": lambda data, depth: to_human(int(data), 1000.0),
-            "B": lambda data, depth: locale.format('%d', data),
+            "B": lambda data, depth: locale.format_string('%d', data),
             "l": lambda data, depth: to_minutes(int(data)),
-            "L": lambda data, depth: locale.format('%d', data),
+            "L": lambda data, depth: locale.format_string('%d', data),
             "m": lambda data, depth: time.ctime(data),
             "n": lambda data, depth: self.indent(data, depth),
             "s": lambda data, depth: to_human(data),
@@ -142,11 +142,12 @@ class Column(object):
                 data = ' ' * len(self.suffix)
         if self.width != None:
             try:
-                if not isinstance(data, unicode):
+                if isinstance(data, bytes):
                     data = data.decode('utf-8')
                 data = unicodedata.normalize('NFC', data)
-                data = u"%*.*s" % (self.width, abs(self.width), data)
-                data = data.encode('utf-8')
+                data = "%*.*s" % (self.width, abs(self.width), data)
+                if isinstance(data, str):
+                    data = data.encode('utf-8')
             except UnicodeError:
                 data = "%*.*s" % (self.width, abs(self.width), data)
         return data

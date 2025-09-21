@@ -16,7 +16,8 @@ import sys
 def listdir(path):
 
     try:
-        path = path.decode('utf-8')
+        if isinstance(path, bytes):
+            path = path.decode('utf-8')
     except UnicodeError:
         # Try to emulate the behavior of os.listdir(u'...') if the path isn't
         # valid for the FS encoding. There's nothing we can do on Windows as
@@ -28,20 +29,18 @@ def listdir(path):
         paths = []
         for p in os.listdir(path):
             try:
-                paths.append(p.decode(fsenc).encode('utf-8'))
+                if isinstance(p, bytes):
+                    paths.append(p.decode(fsenc))
+                else:
+                    paths.append(p)
             except UnicodeError:
                 paths.append(p)
         return paths
 
     paths = []
     for p in os.listdir(path):
-        # Don't encode paths that aren't Unicode. os.listdir will return str
-        # objects for any paths it couldn't decode to unicode objects (see
-        # http://bugs.python.org/issue683592).
-        if isinstance(p, unicode):
-            paths.append(p.encode('utf-8'))
-        else:
-            paths.append(p)
+        # In Python 3, just return the paths as strings
+        paths.append(p)
     return paths
 
 
@@ -49,7 +48,10 @@ def _wrap(func):
 
     def wrapper(path, *args, **kw):
         try:
-            return func(path.decode('utf-8'), *args, **kw)
+            if isinstance(path, bytes):
+                return func(path.decode('utf-8'), *args, **kw)
+            else:
+                return func(path, *args, **kw)
         except UnicodeError:
             return func(path, *args, **kw)
     return wrapper

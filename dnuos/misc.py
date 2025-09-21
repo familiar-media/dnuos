@@ -73,26 +73,26 @@ class Lookahead(object):
     >>> x = Lookahead(iter(('0', '1', '2')))
     >>> x.lookahead
     '0'
-    >>> x.next()
+    >>> next(x)
     '0'
     >>> x.lookahead
     '1'
-    >>> x.next()
+    >>> next(x)
     '1'
     >>> x.lookahead
     '2'
     >>> y = Lookahead(iter(('1', '2', '3')))
-    >>> y.next()
+    >>> next(y)
     '1'
     >>> x == y
     True
-    >>> y.next()
+    >>> next(y)
     '2'
     >>> x <= y
     True
     >>> x.empty
     False
-    >>> x.next()
+    >>> next(x)
     '2'
     >>> x.empty
     True
@@ -106,7 +106,7 @@ class Lookahead(object):
         self.sort_cmp = sort_cmp
         self.lookahead = None
         self.empty = False
-        self.next()
+        next(self)
 
     def __iter__(self):
 
@@ -117,16 +117,38 @@ class Lookahead(object):
 
         result = self.lookahead
         try:
-            self.lookahead = self.iterator.next()
+            self.lookahead = next(self.iterator)
         except StopIteration:
             self.lookahead = None
             self.empty = True
         return result
 
+    def __next__(self):
+        """Python 3 iterator protocol"""
+        return self.next()
+
     def __cmp__(self, other):
         """Compare iterator heads (as opposed to the entire iterators)"""
 
         return self.sort_cmp(self.lookahead, other.lookahead)
+
+    def __lt__(self, other):
+        return self.sort_cmp(self.lookahead, other.lookahead) < 0
+
+    def __le__(self, other):
+        return self.sort_cmp(self.lookahead, other.lookahead) <= 0
+
+    def __eq__(self, other):
+        return self.sort_cmp(self.lookahead, other.lookahead) == 0
+
+    def __ne__(self, other):
+        return self.sort_cmp(self.lookahead, other.lookahead) != 0
+
+    def __gt__(self, other):
+        return self.sort_cmp(self.lookahead, other.lookahead) > 0
+
+    def __ge__(self, other):
+        return self.sort_cmp(self.lookahead, other.lookahead) >= 0
 
 
 def deprecation(message):
@@ -228,7 +250,7 @@ def merge(iterators, sort_cmp=cmp):
     # elements, and thus the next element in the ordered merged iteration.
     while heap:
         iterator, index = heappop(heap)
-        yield iterator.next()
+        yield next(iterator)
         if not iterator.empty:
             heappush(heap, (iterator, index))
 
@@ -256,9 +278,9 @@ def to_human(value, radix=1024.0):
         i += 1
     suffix = " kMG"[i]
     if value > 100:
-        value = locale.format('%d', value)
+        value = locale.format_string('%d', value)
     elif value < 10:
-        value = locale.format('%.2f', value)
+        value = locale.format_string('%.2f', value)
     else:
-        value = locale.format('%.1f', value)
+        value = locale.format_string('%.1f', value)
     return "%s%s" % (value, suffix)
