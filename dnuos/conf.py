@@ -56,7 +56,7 @@ def print_help(option, opt_str, value, parser):
 def exit_with_output_help(option, opt_str, value, parser):
     """Prints output help and exits program"""
 
-    print(_(r""")
+    print(_("""
 Anything enclosed by brackets is considered a field. A field must have the
 following syntax:
   [TAG]
@@ -108,7 +108,7 @@ Unescaped brackets are forbidden unless they define a field.
 
 Note: If you have any whitespace in your output string you must put it inside
 quotes or otherwise it will not get parsed right.
-""")
+"""))
     sys.exit()
 
 
@@ -432,21 +432,19 @@ def parse_args(argv=sys.argv):
     if not options.basedirs and not (options.cull_cache or
         options.delete_cache):
         if options.disp_version:
-            print("".join(dnuos.output.plaintext.render_version(), \
-                dnuos.__version__))
+            print("".join([dnuos.output.plaintext.render_version(), dnuos.__version__]))
             sys.exit()
-        print((_("No folders to process.\nType `%s -h' ", file=sys.stderr)
-                                "for help.") % os.path.basename(argv[0]))
+        print(_("No folders to process.\nType `%s -h' for help.") % os.path.basename(argv[0]), file=sys.stderr)
         sys.exit(2)
 
     for basedir in options.basedirs:
         if not dnuos.path.exists(basedir):
-            print(_('No such file or directory: %s', file=sys.stderr) % basedir
+            print(_('No such file or directory: %s') % basedir, file=sys.stderr)
             sys.exit(2)
 
     # options overriding eachother
     if options.debug or (not options.outfile and
-                         isinstance(sys.stdout, file) and
+                         hasattr(sys.stdout, 'isatty') and
                          sys.stdout.isatty()):
         options.show_progress = False
     if options.output_module == dnuos.output.db:

@@ -1,6 +1,10 @@
 """HTML renderer"""
 
-from cgi import escape
+try:
+    from cgi import escape
+except ImportError:
+    # Python 3.8+
+    from html import escape
 
 import dnuos
 from dnuos.misc import _
