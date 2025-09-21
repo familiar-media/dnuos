@@ -10,13 +10,16 @@ Dnuos is a console program that creates lists of music collections based on dire
 
 ### Build and Installation
 ```bash
-# Build the project
-python setup.py build
+# Modern build approach (recommended)
+python -m build
 
 # Install locally
-sudo python setup.py install
+pip install .
 
-# Alternative: Using make
+# Development install (editable)
+pip install -e .
+
+# Alternative: Legacy approach using make
 make build
 make install
 
@@ -26,17 +29,21 @@ make clean
 
 ### Testing
 ```bash
-# Run the test suite (requires testdata.zip in project root)
-python setup.py test
+# Run the test suite
+python3 run_tests.py [optional_testdata_dir]
+
+# Run just the core doctests
+python3 -m doctest dnuos/*.py
 
 # Test data can be downloaded from:
 # https://bitheap.org/dnuos/files/testdata.zip
+# Extract to ./testdata/ for full functional tests
 ```
 
 ### Development Commands
 ```bash
 # Build translations (.mo files from .po files)
-python setup.py build_mo
+python3 build_translations.py
 
 # Run dnuos after installation
 dnuos --help
@@ -82,3 +89,14 @@ Optional:
 - **`LISEZMOI.md`** - French README if it contains version references
 
 The `__version__` in `dnuos/__init__.py` is the canonical source referenced by HTML output, version commands, and other parts of the codebase.
+
+## Translation Building
+
+The project includes French translations. Two methods are available for building translation files:
+
+1. **Manual building**: `python3 build_translations.py` (always works)
+2. **Automatic during setup.py build**: Only works if `msgfmt` module is available
+
+The setup.py gracefully handles missing translation tools and will skip building .mo files if msgfmt is not available, preventing build failures in environments without gettext tools.
+
+To include translations in distribution packages, run `python3 build_translations.py` before building.

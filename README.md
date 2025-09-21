@@ -221,13 +221,12 @@ Download the official development repository using [Git][]:
 
     git clone https://github.com/brodie/dnuos.git
 
-Running the test suite requires the [test data][] (in the same directory as
-`setup.py`). Once you have it, you can run the tests with the following
-command:
+Running the test suite requires the [test data][] (extract to `./testdata/`).
+Once you have it, you can run the tests with the following command:
 
-    python3 setup.py test
+    python3 run_tests.py
 
-You can also run the doctests directly:
+You can also run just the core doctests:
 
     python3 -m doctest dnuos/*.py
 

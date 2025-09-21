@@ -80,23 +80,50 @@ class build_mo(Command):
 
     def run(self):
         from glob import glob
-        from msgfmt import compile_catalog
-        for path in glob('./dnuos/locale/*/LC_MESSAGES/*.po'):
-            compile_catalog(path)
+        try:
+            from msgfmt import compile_catalog
+        except ImportError:
+            print("Warning: msgfmt module not found, skipping translation compilation")
+            print("To build translations manually, run: python3 build_translations.py")
+            return
 
+        po_files = glob('./dnuos/locale/*/LC_MESSAGES/*.po')
+        if not po_files:
+            print("No .po files found for translation")
+            return
+
+        for path in po_files:
+            try:
+                compile_catalog(path)
+                print(f"Compiled translation: {path}")
+            except Exception as e:
+                print(f"Warning: Failed to compile {path}: {e}")
+                print("You can try building translations manually with: python3 build_translations.py")
+
+# Prepare cmdclass - only include build_mo if msgfmt is available
+cmdclass_dict = {'test': test}
+
+# Only register build_mo as a subcommand if msgfmt is available
+# This prevents build failures when translation tools aren't installed
 try:
-    # Workaround for setuptools not running build subcommands
-    from setuptools.command.build_py import build_py
-    old_run = build_py.run
-    def build_py_run(self):
-        for cmd in self.get_sub_commands():
-            self.run_command(cmd)
-        old_run(self)
-    build_py.run = build_py_run
-    build_py.sub_commands.append(('build_mo', None))
+    import msgfmt
+    # msgfmt is available, register the build_mo command
+    cmdclass_dict['build_mo'] = build_mo
+    try:
+        from setuptools.command.build_py import build_py
+        old_run = build_py.run
+        def build_py_run(self):
+            for cmd in self.get_sub_commands():
+                self.run_command(cmd)
+            old_run(self)
+        build_py.run = build_py_run
+        build_py.sub_commands.append(('build_mo', None))
+    except ImportError:
+        from distutils.command.build import build
+        build.sub_commands.append(('build_mo', None))
 except ImportError:
-    from distutils.command.build import build
-    build.sub_commands.append(('build_mo', None))
+    # msgfmt not available, skip automatic translation building
+    print("Info: msgfmt not available, translation building disabled")
 
 setup(
     author='Mattias P\xc3\xa4iv\xc3\xa4rinta, Brodie Rao',
@@ -112,9 +139,9 @@ setup(
         'Topic :: Communications :: File Sharing',
         'Topic :: Multimedia :: Sound/Audio',
     ],
-    cmdclass={'build_mo': build_mo, 'test': test},
+    cmdclass=cmdclass_dict,
     description='A tool for creating lists of music collections',
-    download_url='http://bitheap.org/dnuos/files/dnuos-1.0.11.tar.gz',
+    download_url='http://bitheap.org/dnuos/files/dnuos-2.0.0.tar.gz',
     keywords='music collection list metadata mp3 audiolist oidua',
     license='GNU GPL',
     long_description="""
